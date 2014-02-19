@@ -23,15 +23,15 @@ public class LogScriptStatementsTransform implements ASTTransformation {
     def loggerScriptNode = new ClassNode(LoggerScript.class)
 
     public void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
-        def moduleAST = sourceUnit.getAST()
-        String mainClassName = moduleAST.getMainClassName()
-        ClassNode mainClass = moduleAST.getClasses().find { it.name == mainClassName }
+        def moduleAST = sourceUnit.AST
+        String mainClassName = moduleAST.mainClassName
+        ClassNode mainClass = moduleAST.classes.find { it.name == mainClassName }
 
         if (mainClass.isScript()) {
             mainClass.setSuperClass(loggerScriptNode)
-            mainClass.getMethods()?.each { MethodNode method ->
+            mainClass.methods?.each { MethodNode method ->
                 if (method.isScriptBody()) {
-                    BlockStatement topCode = method.getCode()
+                    BlockStatement topCode = method.code
                     List<Statement> existingStatements = topCode.statements
                     List<Statement> transformedStatements = existingStatements.collect { statementWrapper(it, it.lineNumber) }
                     method.setCode(new BlockStatement(transformedStatements, topCode.variableScope))
