@@ -33,7 +33,7 @@ public class LogScriptStatementsTransform implements ASTTransformation {
                 if (method.isScriptBody()) {
                     BlockStatement topCode = method.code
                     List<Statement> existing = topCode.statements
-                    List<Statement> transformed = existing.collect { statementWrapper(it, it.lineNumber) }
+                    List<Statement> transformed = existing.collectMany { statementWrapper(it, it.lineNumber) }
                     method.setCode(new BlockStatement(transformed, topCode.variableScope))
                 }
             }
@@ -42,24 +42,24 @@ public class LogScriptStatementsTransform implements ASTTransformation {
 
     def EXCLUDED_EXPRESSION_TYPES = [DeclarationExpression]
 
-    Statement statementWrapper(Statement statement, lineNum) {
+    List<Statement> statementWrapper(Statement statement, lineNum) {
         switch (statement.class) {
             case ExpressionStatement :
                 Expression expression = statement.expression
                 if (expression.class in EXCLUDED_EXPRESSION_TYPES) {
-                    statement
+                    [statement]
                 } else {
-                    new ExpressionStatement(
+                    [new ExpressionStatement(
                             new MethodCallExpression(
                                     new VariableExpression("this")
                                     , "_log"
                                     , new ArgumentListExpression([new ConstantExpression(lineNum), statement.expression])
                             )
-                    )
+                    )]
                 }
                 break
             default :
-                statement
+                [statement]
         }
     }
 
