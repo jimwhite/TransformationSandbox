@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="TransformationSandbox:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TransformationSandbox_jar</output-path>
+    <root id="root">
+      <element id="archive" name="TransformationSandbox.jar">
+        <element id="module-output" name="TransformationSandbox" />
+        <element id="directory" name="META-INF">
+          <element id="dir-copy" path="$PROJECT_DIR$/META-INF/services" />
+        </element>
+      </element>
+      <element id="library" level="application" name="groovy-2.2.1" />
+    </root>
+  </artifact>
+</component>
