@@ -50,11 +50,11 @@ public class LogScriptStatementsTransform implements ASTTransformation {
                     [statement]
                 } else {
                     [new ExpressionStatement(
-                            new MethodCallExpression(
-                                    new VariableExpression("this")
-                                    , "_log"
-                                    , new ArgumentListExpression([new ConstantExpression(lineNum), statement.expression])
-                            )
+                        new MethodCallExpression(
+                            new VariableExpression("this")
+                            , "_log"
+                            , new ArgumentListExpression([new ConstantExpression(lineNum), statement.expression])
+                        )
                     )]
                 }
                 break
