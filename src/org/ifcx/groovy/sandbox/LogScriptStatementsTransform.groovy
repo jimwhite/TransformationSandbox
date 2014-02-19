@@ -32,9 +32,9 @@ public class LogScriptStatementsTransform implements ASTTransformation {
             mainClass.methods?.each { MethodNode method ->
                 if (method.isScriptBody()) {
                     BlockStatement topCode = method.code
-                    List<Statement> existingStatements = topCode.statements
-                    List<Statement> transformedStatements = existingStatements.collect { statementWrapper(it, it.lineNumber) }
-                    method.setCode(new BlockStatement(transformedStatements, topCode.variableScope))
+                    List<Statement> existing = topCode.statements
+                    List<Statement> transformed = existing.collect { statementWrapper(it, it.lineNumber) }
+                    method.setCode(new BlockStatement(transformed, topCode.variableScope))
                 }
             }
         }
