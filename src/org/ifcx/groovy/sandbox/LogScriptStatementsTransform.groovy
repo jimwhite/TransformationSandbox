@@ -27,7 +27,7 @@ public class LogScriptStatementsTransform implements ASTTransformation {
         String mainClassName = moduleAST.mainClassName
         ClassNode mainClass = moduleAST.classes.find { it.name == mainClassName }
 
-        if (mainClass.isScript()) {
+        if (mainClass?.isScript()) {
             mainClass.setSuperClass(loggerScriptNode)
             mainClass.methods?.each { MethodNode method ->
                 if (method.isScriptBody()) {
@@ -40,27 +40,31 @@ public class LogScriptStatementsTransform implements ASTTransformation {
         }
     }
 
-    def EXCLUDED_EXPRESSION_TYPES = [DeclarationExpression]
-
     List<Statement> statementWrapper(Statement statement, lineNum) {
         switch (statement.class) {
             case ExpressionStatement :
                 Expression expression = statement.expression
-                if (expression.class in EXCLUDED_EXPRESSION_TYPES) {
-                    [statement]
-                } else {
+                if (expression instanceof DeclarationExpression) {
                     [new ExpressionStatement(
-                        new MethodCallExpression(
-                            new VariableExpression("this")
-                            , "_log"
-                            , new ArgumentListExpression([new ConstantExpression(lineNum), statement.expression])
-                        )
-                    )]
+                        new DeclarationExpression(expression.leftExpression
+                            , expression.operation
+                            , loggingExpression(lineNum, statement.expression.rightExpression)
+                    ))]
+                } else {
+                    [new ExpressionStatement(loggingExpression(lineNum, statement.expression))]
                 }
                 break
             default :
                 [statement]
         }
+    }
+
+    private MethodCallExpression loggingExpression(lineNum, Expression expression) {
+        new MethodCallExpression(
+                new VariableExpression("this")
+                , "_log"
+                , new ArgumentListExpression([new ConstantExpression(lineNum), expression])
+        )
     }
 
 }
