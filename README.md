@@ -1,4 +1,4 @@
-* A start on value tracing/logging for Groovy scripts prompted by Magnus Rundberget's
+A start on value tracing/logging for Groovy scripts prompted by Magnus Rundberget's
 call for help on how to get values reported for his Groovy Light Table plugin.
 
 A global AST transform (LogScriptTransform.groovy) wraps the topmost expression 
