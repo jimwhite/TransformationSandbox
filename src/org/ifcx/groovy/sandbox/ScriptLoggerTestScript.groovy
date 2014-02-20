@@ -1,3 +1,5 @@
+package org.ifcx.groovy.sandbox
+
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer
 import org.ifcx.groovy.sandbox.LogScriptStatementsTransform
@@ -10,9 +12,15 @@ def x = 1 * 2 + 3
 
 y = 4
 
-println "one statement"
-
-println "another statement"
+while (y--) {
+  if (y & 1) {
+        y
+        println "one statement"
+  } else {
+        y
+        println "another statement"
+  }
+}
 
 z = x * y
 
