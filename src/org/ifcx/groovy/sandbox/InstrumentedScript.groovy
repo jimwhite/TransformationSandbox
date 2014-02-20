@@ -14,6 +14,15 @@ while (y--) {
   }
 }
 
+class Foo {
+    def a = 11
+    def b = 22
+    def c() { a * b }
+}
+
+new Foo().a * new Foo().b
+new Foo().c() / 2
+
 z = x * y
 
 println z
