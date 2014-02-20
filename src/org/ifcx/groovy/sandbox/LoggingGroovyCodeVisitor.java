@@ -39,15 +39,11 @@ public class LoggingGroovyCodeVisitor extends ClassCodeExpressionTransformer {
 
     @Override
     public void visitAnnotations(AnnotatedNode node) {
-
+        // No sense in looking for trouble...
     }
 
     /**
      * Don't treat the LHS of a declaration as something we can wrap, just the RHS.
-     *
-     * TODO: There are potentially other expressions which need special handling (like indexing and variables).
-     * This code may be working because those children have their parent flagged as being the
-     * expression that gets logged on the particular line.
      *
      * @param expression
      */
@@ -73,6 +69,10 @@ public class LoggingGroovyCodeVisitor extends ClassCodeExpressionTransformer {
      * Wrap the given expression with a logging method call.  Some kinds of expressions don't
      * like being wrapped in a simple fashion and so we have to handle them specially.
      * The ExpressionTransformer doesn't have methods for each type so we check for each one here.
+     *
+     * TODO: There are potentially other expressions which need special handling (like indexing and variables).
+     * This code may be working because those types have their parent being wrapped
+     * and we don't transform their children.
      *
      * @param lineNumber line number to report for this value
      * @param expression the expression whose value we want to report

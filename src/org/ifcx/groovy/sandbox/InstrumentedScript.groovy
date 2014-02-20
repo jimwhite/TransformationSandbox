@@ -14,6 +14,16 @@ while (y--) {
   }
 }
 
+def n = [9, 8, 7]
+
+n[1]
+n[0] = 33
+
+def (o, p, q) = "abc" as List
+o
+p
+q
+
 class Foo {
     def a = 11
     def b = 22
