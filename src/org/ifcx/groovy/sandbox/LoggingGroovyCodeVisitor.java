@@ -42,40 +42,63 @@ public class LoggingGroovyCodeVisitor extends ClassCodeExpressionTransformer {
 
     }
 
+    /**
+     * Don't treat the LHS of a declaration as something we can wrap, just the RHS.
+     *
+     * TODO: There are potentially other expressions which need special handling (like indexing and variables).
+     * This code may be working because those children have their parent flagged as being the
+     * expression that gets logged on the particular line.
+     *
+     * @param expression
+     */
     @Override
     public void visitDeclarationExpression(DeclarationExpression expression) {
         expression.getRightExpression().visit(this);
     }
 
+    /**
+     * Transform an expression by wrapping it in a logging method call, but only
+     * if we're the first (highest level) expression to try and log on this line.
+     *
+     * @param exp the expression to transform
+     * @return the transformed expression
+     */
     @Override
     public Expression transform(Expression exp) {
-        if (exp instanceof DeclarationExpression) {
-            DeclarationExpression declarationExpression = (DeclarationExpression) exp;
-            return new DeclarationExpression(declarationExpression.getLeftExpression()
-                    , declarationExpression.getOperation()
-                    , transform(declarationExpression.getRightExpression()));
-        }
-
         Integer lineNumber = exp.getLineNumber();
-
-        // Only wrap an expression with logging if we're the first
-        // (highest level) expression to try and log on this line.
-        return loggedLines.add(lineNumber) ? loggingExpression(lineNumber, exp): super.transform(exp);
+        return loggedLines.add(lineNumber) ? loggingExpression(lineNumber, exp) : super.transform(exp);
     }
 
+    /**
+     * Wrap the given expression with a logging method call.  Some kinds of expressions don't
+     * like being wrapped in a simple fashion and so we have to handle them specially.
+     * The ExpressionTransformer doesn't have methods for each type so we check for each one here.
+     *
+     * @param lineNumber line number to report for this value
+     * @param expression the expression whose value we want to report
+     * @return an expression that computes the value and also reports it somewheres
+     */
     private Expression loggingExpression(Integer lineNumber, Expression expression) {
+        if (expression instanceof DeclarationExpression) {
+            DeclarationExpression declarationExpression = (DeclarationExpression) expression;
+
+            return new DeclarationExpression(declarationExpression.getLeftExpression()
+                    , declarationExpression.getOperation()
+                    , loggingExpression(lineNumber, declarationExpression.getRightExpression()));
+        }
+
         if (expression instanceof BooleanExpression) {
             BooleanExpression booleanExpression = (BooleanExpression) expression;
             return new BooleanExpression(new MethodCallExpression(
                     new VariableExpression("this")
                     , "_log"
                     , new ArgumentListExpression(new ConstantExpression(lineNumber), booleanExpression.getExpression())));
-        } else {
-            return new MethodCallExpression(
-                    new VariableExpression("this")
-                    , "_log"
-                    , new ArgumentListExpression(new ConstantExpression(lineNumber), expression));
         }
+
+        return new MethodCallExpression(
+                new VariableExpression("this")
+                , "_log"
+                , new ArgumentListExpression(new ConstantExpression(lineNumber), expression));
     }
 
 }
